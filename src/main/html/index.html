@@ -18,14 +18,42 @@
     var EPS = 0.00001;
 
     var map;
-    var markers = new Array();
+    var markers = {};
 
-    var updateMarkers = function(values) {
+    var hasChanged = function(marker, point) {
+        var markerLat = marker.getPosition().lat();
+        var markerLon = marker.getPosition().lng();
+        var result = Math.abs(markerLat - point.lat) > EPS || Math.abs(markerLon - point.lon) > EPS;
 
-        for(var i=0; i < markers.length; i++){
-            markers[i].setMap(null);
+        if (result) {
+            console.log("marker changed : " + point);
         }
-        markers = new Array();
+
+        return result;
+    }
+
+    var createMarker = function(point) {
+        var pointLatlng = new google.maps.LatLng(point.lat, point.lon);
+        var marker = new google.maps.Marker({
+            position: pointLatlng,
+            map: map,
+            title: point.id
+        });
+
+        return marker;
+    }
+
+    var updateMarkers = function(points) {
+        for (var i = 0; i < points.length; i++) {
+            var point = points[i];
+
+            if (!markers[point.id]) {
+                markers[point.id] = createMarker(point);
+            } else if (hasChanged(markers[point.id], point)) {
+                markers[point.id].setMap(null);
+                markers[point.id] = createMarker(point);
+            }
+        }
     };
 
     var refresh = function() {
@@ -41,19 +69,7 @@
 
         $.getJSON(url,
             function(data) {
-                clearMarkers();
-
-                for (var i = 0; i < data.length; i++) {
-                    var point = data[i];
-
-                    var pointLatlng = new google.maps.LatLng(point.lat, point.lon);
-                    var marker = new google.maps.Marker({
-                        position: pointLatlng,
-                        map: map,
-                        title: point.id
-                    });
-                    markers.push(marker);
-                }
+                updateMarkers(data);
             }
         );
     }
