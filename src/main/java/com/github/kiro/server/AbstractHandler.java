@@ -49,6 +49,7 @@ public abstract class AbstractHandler implements HttpHandler {
 
     public final void handle(HttpExchange httpExchange) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        System.out.println(httpExchange.getRequestURI());
         handle(httpExchange.getRequestURI(), outputStream);
         outputStream.close();
 

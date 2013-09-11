@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -13,6 +14,7 @@ import static com.google.common.collect.Lists.newArrayList;
  */
 public class PointsIndex {
     private final GeoIndex<Set<Point>> points;
+    private final ConcurrentHashMap<String, Point> lastValue = new ConcurrentHashMap<String, Point>();
 
     public PointsIndex(Distance size) {
         this.points = new GeoIndex<Set<Point>>(size, new Function<Void, Set<Point>>() {
@@ -24,6 +26,10 @@ public class PointsIndex {
     }
 
     public void add(Point point) {
+        if (lastValue.containsKey(point.id)) {
+            throw new IllegalStateException("Point with id " + point.id + " already exists");
+        }
+        lastValue.put(point.id, point);
         points.get(point).add(point);
     }
 
@@ -34,7 +40,11 @@ public class PointsIndex {
     }
 
     public void remove(Point point) {
-        points.get(point).remove(point);
+        if (lastValue.containsKey(point.id)) {
+            Point lastPoint = lastValue.get(point.id);
+            points.get(lastPoint).remove(lastPoint);
+            lastValue.remove(point.id);
+        }
     }
 
     public void update(Point point) {

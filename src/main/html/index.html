@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+        html, body, #map-canvas {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        }
+    </style>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script>
+
+    var map;
+    var markers = new Array();
+    var clearMarkers = function() {
+        for(var i=0; i < markers.length; i++){
+            markers[i].setMap(null);
+        }
+        markers = new Array();
+    };
+
+    var refresh = function() {
+        var bounds = map.getBounds();
+
+        var ne = bounds.getNorthEast();
+        var sw = bounds.getSouthWest();
+
+        console.log(ne);
+        var url = '/query?topLeftLat=' + ne.lat() + '&topLeftLon=' + sw.lng() + '&bottomRightLat=' + sw.lat() + '&bottomRightLon=' + ne.lng();
+
+        console.log(url);
+
+        $.getJSON(url,
+            function(data) {
+                clearMarkers();
+
+                for (var i = 0; i < data.length; i++) {
+                    var point = data[i];
+
+                    var pointLatlng = new google.maps.LatLng(point.lat, point.lon);
+                    var marker = new google.maps.Marker({
+                        position: pointLatlng,
+                        map: map,
+                        title: point.id
+                    });
+                    markers.push(marker);
+                }
+            }
+        );
+    }
+
+    var refreshCycle;
+    refreshCycle = function() {
+        refresh();
+        setTimeout(refreshCycle, 1000);
+    }
+    setTimeout(refreshCycle, 2000);
+
+    function initialize() {
+        var mapOptions = {
+            zoom: 13,
+            center: new google.maps.LatLng(51.508742,-0.118318),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+        google.maps.event.addListener(map, 'idle', refresh);
+    }
+
+    $(document).ready(initialize);
+
+    </script>
+</head>
+<body>
+<div id="map-canvas"></div>
+</body>
+</html>

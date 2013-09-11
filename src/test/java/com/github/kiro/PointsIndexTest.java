@@ -12,6 +12,7 @@ import static com.github.kiro.Point.point;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests GeoIndex.
@@ -52,6 +53,20 @@ public class PointsIndexTest {
 
         assertEquals(newHashSet(pointsIndex.within(oxford, embankment)),
                 newHashSet(leicester, coventGarden, picadilly, charring));
+    }
+
+    @Test
+    public void testUpdate() throws Exception {
+        PointsIndex pointsIndex = new PointsIndex(km(0.1));
+        pointsIndex.addAll(tubeStations());
+
+        Point newLeicester = point(leicester.id, 51.512188,-0.116822);
+        pointsIndex.update(newLeicester);
+
+        String points = pointsIndex.kNearest(newLeicester, 20, km(3)).toString();
+        int lastIndex = points.indexOf(leicester.id);
+        assertTrue(lastIndex >= 0);
+        assertEquals(points.indexOf(leicester.id, lastIndex + 1), -1);
     }
 
     @Test

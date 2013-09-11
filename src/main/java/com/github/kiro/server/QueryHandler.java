@@ -6,6 +6,7 @@ import com.github.kiro.PointsIndex;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 import static com.github.kiro.Point.point;
@@ -24,14 +25,14 @@ public class QueryHandler extends AbstractHandler {
     public void handle(URI uri, OutputStream outputStream) throws IOException {
         Map<String, String> params = urlParams(uri);
 
-        double minLat = Double.parseDouble(params.get("minLat"));
-        double maxLat = Double.parseDouble(params.get("maxLat"));
-        double minLon = Double.parseDouble(params.get("minLon"));
-        double maxLon = Double.parseDouble(params.get("maxLon"));
+        double topLeftLat = Double.parseDouble(params.get("topLeftLat"));
+        double topLeftLon = Double.parseDouble(params.get("topLeftLon"));
+        double bottomRightLat = Double.parseDouble(params.get("bottomRightLat"));
+        double bottomRightLon = Double.parseDouble(params.get("bottomRightLon"));
 
-        Iterable<Point> points = pointsIndex.within(
-                point("topLeft", maxLat, minLon),
-                point("bottomRight", minLat, maxLon)
+        List<Point> points = pointsIndex.within(
+                point("topLeft", topLeftLat, topLeftLon),
+                point("bottomRight", bottomRightLat, bottomRightLon)
         );
 
         outputStream.write(toResultsJson(points));
