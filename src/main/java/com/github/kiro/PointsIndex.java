@@ -60,8 +60,6 @@ public class PointsIndex {
         List<Point> pointsList = newArrayList(points);
         Collections.sort(pointsList, comparator(point));
 
-        System.out.println(points);
-
         return pointsList.subList(0, Math.min(pointsList.size(), k));
     }
 

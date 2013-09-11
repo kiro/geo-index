@@ -1,0 +1,3 @@
+[submodule "nsq-java"]
+	path = nsq-java
+	url = https://github.com/kiro/nsq-java.git
