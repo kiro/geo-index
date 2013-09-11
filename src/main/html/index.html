@@ -15,9 +15,13 @@
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script>
 
+    var EPS = 0.00001;
+
     var map;
     var markers = new Array();
-    var clearMarkers = function() {
+
+    var updateMarkers = function(values) {
+
         for(var i=0; i < markers.length; i++){
             markers[i].setMap(null);
         }

@@ -13,6 +13,7 @@ import static com.google.common.collect.Lists.newArrayList;
  * Index of points.
  */
 public class PointsIndex {
+    private int size = 0;
     private final GeoIndex<Set<Point>> points;
     private final ConcurrentHashMap<String, Point> lastValue = new ConcurrentHashMap<String, Point>();
 
@@ -31,6 +32,7 @@ public class PointsIndex {
         }
         lastValue.put(point.id, point);
         points.get(point).add(point);
+        size++;
     }
 
     public void addAll(List<Point> points) {
@@ -44,6 +46,7 @@ public class PointsIndex {
             Point lastPoint = lastValue.get(point.id);
             points.get(lastPoint).remove(lastPoint);
             lastValue.remove(point.id);
+            size--;
         }
     }
 
@@ -85,6 +88,9 @@ public class PointsIndex {
         return pointsList.subList(0, Math.min(pointsList.size(), k));
     }
 
+    public int size() {
+        return size;
+    }
 
     private static Comparator<Point> comparator(final Point point) {
         return new Comparator<Point>() {

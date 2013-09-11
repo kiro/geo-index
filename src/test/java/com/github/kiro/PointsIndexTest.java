@@ -5,6 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.FileReader;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.github.kiro.Distance.km;
@@ -70,7 +71,6 @@ public class PointsIndexTest {
     }
 
     @Test
-    @Ignore
     public void loadTest() throws Exception {
         List<Point> tubeStations = tubeStations();
         PointsIndex pointsIndex = new PointsIndex(km(0.5));
@@ -84,6 +84,37 @@ public class PointsIndexTest {
         }
 
         System.out.println(count);
+    }
+
+    @Test
+    @Ignore
+    public void testWithALotOfPoints() throws Exception {
+        List<Point> worldCapitals = worldCapitals();
+
+        PointsIndex pointsIndex = new PointsIndex(km(0.5));
+
+        for (Point capital : worldCapitals) {
+            for (int i = 0; i < 500; i++) {
+                pointsIndex.add(point(
+                        capital.id + i,
+                        capital.lat + Math.random() * 0.1,
+                        capital.lon + Math.random() * 0.1
+                ));
+            }
+        }
+
+        System.out.println(pointsIndex.size());
+    }
+
+    private List<Point> worldCapitals() throws Exception {
+        List<Point> capitals = newArrayList();
+        CSVReader reader = new CSVReader(new FileReader("capitals.txt"), '\t');
+
+        for (String [] parts : reader.readAll()) {
+            capitals.add(point(parts[2], Double.parseDouble(parts[3]), Double.parseDouble(parts[4])));
+        }
+
+        return capitals;
     }
 
     private List<Point> tubeStations() throws Exception {
