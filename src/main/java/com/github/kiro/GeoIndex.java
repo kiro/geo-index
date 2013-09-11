@@ -53,7 +53,7 @@ public class GeoIndex<T> {
         Index topLeftIndex = Index.of(topLeft, size);
         Index bottomRightIndex = Index.of(bottomRight, size);
 
-        return get(topLeftIndex.x, bottomRightIndex.x, bottomRightIndex.y, topLeftIndex.y);
+        return get(bottomRightIndex.x, topLeftIndex.x, topLeftIndex.y, bottomRightIndex.y);
     }
 
     public List<T> kNearest(Point point, int k, Distance maxDistance, Function<T, Integer> count) {

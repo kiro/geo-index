@@ -37,15 +37,27 @@ public class PointsIndex {
         points.get(point).remove(point);
     }
 
-    public void update(Point old, Point newPoint) {
-        remove(old);
-        add(newPoint);
+    public void update(Point point) {
+        remove(point);
+        add(point);
     }
 
-    public Iterable<Point> within(Point topLeft, Point bottomRight) {
+    private boolean between(double value, double min, double max) {
+        return value > min && value < max;
+    }
+
+    public List<Point> within(Point topLeft, Point bottomRight) {
         List<Set<Point>> allPoints = points.within(topLeft, bottomRight);
 
-        return Iterables.concat(allPoints);
+        List<Point> result = newArrayList();
+        for (Point point : Iterables.concat(allPoints)) {
+            if (between(point.lat, bottomRight.lat, topLeft.lat) &&
+                between(point.lon, topLeft.lon, bottomRight.lon)) {
+                result.add(point);
+            }
+        }
+
+        return result;
     }
 
     public Iterable<Point> kNearest(Point point, int k, Distance maxDistance) {

@@ -17,14 +17,16 @@ import static org.junit.Assert.assertEquals;
  * Tests GeoIndex.
  */
 public class PointsIndexTest {
+    private Point leicester = point("Leicester Square",51.511291,-0.128242);
+    private Point coventGarden = point("Covent Garden",51.51276,-0.124507);
+    private Point totenham = point("Tottenham Court Road",51.516206,-0.13087);
+    private Point picadilly = point("Piccadilly Circus",51.50986,-0.1337);
+    private Point charring = point("Charing Cross",51.508359,-0.124803);
+    private Point embankment = point("Embankment",51.507312,-0.122367);
+    private Point oxford = point("Oxford Circus",51.51511,-0.1417);
+
     @Test
     public void testPoints() {
-        Point leicester = point("Leicester Square",51.511291,-0.128242);
-        Point coventGarden = point("Covent Garden",51.51276,-0.124507);
-        Point totenham = point("Tottenham Court Road",51.516206,-0.13087);
-        Point picadilly = point("Piccadilly Circus",51.50986,-0.1337);
-        Point charring = point("Charing Cross",51.508359,-0.124803);
-        Point embankment = point("Embankment",51.507312,-0.122367);
 
         List<Point> points = newArrayList(leicester, coventGarden, totenham, picadilly, charring, embankment);
 
@@ -44,6 +46,15 @@ public class PointsIndexTest {
     }
 
     @Test
+    public void testWithin() throws Exception {
+        PointsIndex pointsIndex = new PointsIndex(km(0.5));
+        pointsIndex.addAll(tubeStations());
+
+        assertEquals(newHashSet(pointsIndex.within(oxford, embankment)),
+                newHashSet(leicester, coventGarden, picadilly, charring));
+    }
+
+    @Test
     @Ignore
     public void loadTest() throws Exception {
         List<Point> tubeStations = tubeStations();
@@ -53,7 +64,7 @@ public class PointsIndexTest {
         for (int i = 0; i < 1000; i++) {
             for (Point point : tubeStations) {
                 count++;
-                pointsIndex.update(point, point(point.id, point.lat + Math.random(), point.lon + Math.random()));
+                pointsIndex.update(point(point.id, point.lat + Math.random(), point.lon + Math.random()));
             }
         }
 

@@ -46,7 +46,7 @@ public class Point {
 
         Point that = (Point)obj;
 
-        return id.equals(that.id) && Math.abs(lat - that.lat) < EPS && Math.abs(lon - that.lon) < EPS;
+        return id.equals(that.id);
     }
 
     public String toString() {
@@ -55,6 +55,6 @@ public class Point {
 
     @Override
     public int hashCode() {
-        return Objects.hash(lat, lon, id);
+        return id.hashCode();
     }
 }

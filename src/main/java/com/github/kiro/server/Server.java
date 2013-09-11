@@ -62,6 +62,6 @@ public class Server {
 
     public static void main(String [] args) throws Exception {
         PointsIndex pointsIndex = new PointsIndex(km(0.5));
-        new NsqListener(pointsIndex, "vpcutilities01-global01-test.i.hailocab.com", 4151).listen();
+        new NsqListener(pointsIndex, "vpcutilities01-global01-test.i.hailocab.com", 4150).listen();
     }
 }
