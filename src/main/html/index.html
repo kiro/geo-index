@@ -13,12 +13,14 @@
     </style>
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="markerclusterer.js"></script>
     <script>
 
     var EPS = 0.00001;
 
     var map;
     var markers = {};
+    var clusterer;
 
     var hasChanged = function(marker, point) {
         var markerLat = marker.getPosition().lat();
@@ -36,7 +38,7 @@
         var pointLatlng = new google.maps.LatLng(point.lat, point.lon);
         var marker = new google.maps.Marker({
             position: pointLatlng,
-            map: map,
+            //map: map,
             title: point.id
         });
 
@@ -49,9 +51,12 @@
 
             if (!markers[point.id]) {
                 markers[point.id] = createMarker(point);
+                clusterer.addMarker(markers[point.id]);
             } else if (hasChanged(markers[point.id], point)) {
-                markers[point.id].setMap(null);
+                clusterer.removeMarker(markers[point.id]);
+                //markers[point.id].setMap(null);
                 markers[point.id] = createMarker(point);
+                clusterer.addMarker(markers[point.id]);
             }
         }
     };
@@ -88,6 +93,7 @@
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+        clusterer = new MarkerClusterer(map, [], {maxZoom:14});
 
         google.maps.event.addListener(map, 'idle', refresh);
     }

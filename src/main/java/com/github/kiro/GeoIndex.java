@@ -53,6 +53,10 @@ public class GeoIndex<T> {
         Index topLeftIndex = Index.of(topLeft, size);
         Index bottomRightIndex = Index.of(bottomRight, size);
 
+        if (Math.abs(topLeftIndex.x - bottomRightIndex.x) > 200) {
+            return newArrayList();
+        }
+
         return get(bottomRightIndex.x, topLeftIndex.x, topLeftIndex.y, bottomRightIndex.y);
     }
 

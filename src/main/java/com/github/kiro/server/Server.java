@@ -49,7 +49,8 @@ public class Server {
     public static void main(String [] args) throws Exception {
         PointsIndex pointsIndex = new PointsIndex(km(0.5));
         //pointsIndex.addAll(tubeStations());
-        new NsqListener(pointsIndex, "vpcutilities01-global01-test.i.hailocab.com", 4150).listen();
+        //new NsqListener(pointsIndex, "vpcutilities01-global01-test.i.hailocab.com", 4150).listen();
+        new NsqListener(pointsIndex, "localhost", 4153).listen();
         new Server(8080, "html", pointsIndex).start();
     }
 }
