@@ -9,6 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.github.kiro.Distance.km;
+import static com.github.kiro.Files.tubeStations;
+import static com.github.kiro.Files.worldCapitals;
+import static com.github.kiro.Points.*;
 import static com.github.kiro.Point.point;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
@@ -19,14 +22,6 @@ import static org.junit.Assert.assertTrue;
  * Tests GeoIndex.
  */
 public class PointsIndexTest {
-    private Point leicester = point("Leicester Square",51.511291,-0.128242);
-    private Point coventGarden = point("Covent Garden",51.51276,-0.124507);
-    private Point totenham = point("Tottenham Court Road",51.516206,-0.13087);
-    private Point picadilly = point("Piccadilly Circus",51.50986,-0.1337);
-    private Point charring = point("Charing Cross",51.508359,-0.124803);
-    private Point embankment = point("Embankment",51.507312,-0.122367);
-    private Point oxford = point("Oxford Circus",51.51511,-0.1417);
-
     @Test
     public void testPoints() {
 
@@ -87,44 +82,40 @@ public class PointsIndexTest {
     }
 
     @Test
-    @Ignore
     public void testWithALotOfPoints() throws Exception {
-        List<Point> worldCapitals = worldCapitals();
+        List<Point> capitals = worldCapitals();
+        List<Point> points = newArrayList();
 
         PointsIndex pointsIndex = new PointsIndex(km(0.5));
 
-        for (Point capital : worldCapitals) {
+        for (Point capital : capitals) {
             for (int i = 0; i < 500; i++) {
-                pointsIndex.add(point(
+                Point p = point(
                         capital.id + i,
                         capital.lat + Math.random() * 0.1,
                         capital.lon + Math.random() * 0.1
-                ));
+                );
+                points.add(p);
+                pointsIndex.add(p);
             }
         }
 
+        for (Point p : points) {
+            Point next = point(p.id, p.lat + Math.random() * 0.1, p.lon + Math.random() * 0.1);
+            pointsIndex.update(next);
+        }
+
+        int nearest = 0;
+        for (Point p : points) {
+           // System.out.println(p);
+            List<Point> knearest = pointsIndex.kNearest(p, 10, km(10));
+            nearest += knearest.size();
+            //System.out.println(p);
+            //System.out.println(knearest);
+        }
+        System.out.println(nearest);
         System.out.println(pointsIndex.size());
     }
 
-    private List<Point> worldCapitals() throws Exception {
-        List<Point> capitals = newArrayList();
-        CSVReader reader = new CSVReader(new FileReader("capitals.txt"), '\t');
 
-        for (String [] parts : reader.readAll()) {
-            capitals.add(point(parts[2], Double.parseDouble(parts[3]), Double.parseDouble(parts[4])));
-        }
-
-        return capitals;
-    }
-
-    private List<Point> tubeStations() throws Exception {
-        List<Point> stations = newArrayList();
-        CSVReader reader = new CSVReader(new FileReader("tube.csv"));
-
-        for (String [] parts : reader.readAll()) {
-            stations.add(point(parts[0], Double.parseDouble(parts[1]), Double.parseDouble(parts[2])));
-        }
-
-        return stations;
-    }
 }

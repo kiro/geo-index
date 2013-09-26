@@ -73,7 +73,7 @@ public class PointsIndex {
         return result;
     }
 
-    public Iterable<Point> kNearest(Point point, int k, Distance maxDistance) {
+    public List<Point> kNearest(Point point, int k, Distance maxDistance) {
         List<Set<Point>> blocks = points.kNearest(point, k, maxDistance, new Function<Set<Point>, Integer>() {
             @Override
             public Integer apply(Set<Point> points) {

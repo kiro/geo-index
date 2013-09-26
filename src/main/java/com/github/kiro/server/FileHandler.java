@@ -18,6 +18,7 @@ public class FileHandler extends AbstractHandler {
     }
 
     public void handle(URI uri, OutputStream outputStream) throws IOException {
+        System.out.println(uri);
         File file = new File(rootPath + uri.getPath());
         Files.copy(file, outputStream);
     }

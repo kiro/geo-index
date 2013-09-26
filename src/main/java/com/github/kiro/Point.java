@@ -24,6 +24,10 @@ public class Point {
         return new Point(id, lat, lon);
     }
 
+    public Point withId(String id) {
+        return new Point(id, lat, lon);
+    }
+
     public Distance distance(Point p) {
         double earthRadius = 6371;
         double dLat = Math.toRadians(p.lat - lat);
@@ -50,7 +54,7 @@ public class Point {
     }
 
     public String toString() {
-        return id + " lat: " + lat + " lon: " + lon;
+        return JsonToString.apply(this);
     }
 
     @Override

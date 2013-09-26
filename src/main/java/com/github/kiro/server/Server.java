@@ -1,6 +1,7 @@
 package com.github.kiro.server;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.github.kiro.CountIndex;
 import com.github.kiro.Point;
 import com.github.kiro.PointsIndex;
 import com.sun.net.httpserver.HttpServer;
@@ -19,17 +20,21 @@ import static com.google.common.collect.Lists.newArrayList;
 public class Server {
     private HttpServer server;
     private PointsIndex pointsIndex;
+    private CountIndex countIndex;
+
     private final String rootPath;
 
-    public Server(int port, String rootPath, PointsIndex pointsIndex) throws Exception {
+    public Server(int port, String rootPath, PointsIndex pointsIndex, CountIndex countIndex) throws Exception {
         this.server = HttpServer.create(new InetSocketAddress(port), 0);
         this.rootPath = rootPath;
         this.pointsIndex = pointsIndex;
+        this.countIndex = countIndex;
     }
 
     public void start() {
         server.createContext("/", new FileHandler(rootPath));
-        server.createContext("/query", new QueryHandler(pointsIndex));
+        server.createContext("/points", new PointsHandler(pointsIndex));
+        server.createContext("/counts", new CountHandler(countIndex));
         server.start();
 
         System.out.println("Started listening...");
@@ -50,7 +55,14 @@ public class Server {
         PointsIndex pointsIndex = new PointsIndex(km(0.5));
         //pointsIndex.addAll(tubeStations());
         //new NsqListener(pointsIndex, "vpcutilities01-global01-test.i.hailocab.com", 4150).listen();
-        new NsqListener(pointsIndex, "localhost", 4153).listen();
-        new Server(8080, "html", pointsIndex).start();
+
+        CountIndex countIndex = new CountIndex(km(2));
+        for (Point station : tubeStations()) {
+            countIndex.update(station);
+        }
+
+        //new NsqListener(pointsIndex, "localhost", 4153).listen();
+        new Server(8080, "html", pointsIndex, countIndex).start();
+        System.out.println("Server started...");
     }
 }

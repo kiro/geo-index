@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+        html, body, #map-canvas {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        }
+    </style>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="markerclusterer.js"></script>
+    <script>
+
+        var EPS = 0.00001;
+
+        var map;
+        var markers = [];
+
+        var createMarker = function(cluster) {
+            var pointLatlng = new google.maps.LatLng(cluster.point.lat, cluster.point.lon);
+            var marker = new google.maps.Marker({
+                position: pointLatlng,
+                map: map,
+                title: cluster.point.id + " " + cluster.data.value
+            });
+
+            return marker;
+        }
+
+        var updateMarkers = function(points) {
+            for (var i = 0; i < markers.length; i++) {
+                markers[i].map = null;
+            }
+
+            markers = [];
+
+            for (var i = 0; i < points.length; i++) {
+                markers.push(createMarker(points[i]));
+            }
+        }
+
+        var refresh = function() {
+            var bounds = map.getBounds();
+
+            var ne = bounds.getNorthEast();
+            var sw = bounds.getSouthWest();
+
+            console.log(ne);
+            var url = '/counts?topLeftLat=' + ne.lat() + '&topLeftLon=' + sw.lng() + '&bottomRightLat=' + sw.lat() + '&bottomRightLon=' + ne.lng();
+
+            console.log(url);
+
+            $.getJSON(url,
+                function(data) {
+                    updateMarkers(data);
+                }
+            );
+        }
+
+
+/*
+        var refreshCycle;
+
+        refreshCycle = function() {
+            refresh();
+            setTimeout(refreshCycle, 5000);
+        }
+        setTimeout(refreshCycle, 2000);
+*/
+        function initialize() {
+            var mapOptions = {
+                zoom: 13,
+                center: new google.maps.LatLng(51.508742,-0.118318),
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+            clusterer = new MarkerClusterer(map, [], {maxZoom:14});
+
+            google.maps.event.addListener(map, 'idle', refresh);
+        }
+
+        $(document).ready(initialize);
+
+    </script>
+</head>
+<body>
+<div id="map-canvas"></div>
+</body>
+</html>
