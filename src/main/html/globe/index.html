@@ -1,13 +1,13 @@
 <!DOCTYPE HTML>
 <html lang="en">
-  <head>
+<head>
     <title>WebGL Globe</title>
     <meta charset="utf-8">
     <style type="text/css">
-      html {
+        html {
         height: 100%;
-      }
-      body {
+        }
+        body {
         margin: 0;
         padding: 0;
         background: #000000 url(/globe/loading.gif) center center no-repeat;
@@ -16,9 +16,9 @@
         font-size: 13px;
         line-height: 20px;
         height: 100%;
-      }
+        }
 
-      #info {
+        #info {
 
         font-size: 11px;
         position: absolute;
@@ -28,9 +28,9 @@
         right: 10px;
         padding: 10px;
 
-      }
+        }
 
-      #currentInfo {
+        #currentInfo {
         width: 270px;
         position: absolute;
         left: 20px;
@@ -40,22 +40,22 @@
 
         border-top: 1px solid rgba(255,255,255,0.4);
         padding: 10px;
-      }
+        }
 
-      a {
+        a {
         color: #aaa;
         text-decoration: none;
-      }
-      a:hover {
+        }
+        a:hover {
         text-decoration: underline;
-      }
+        }
 
-      .bull {
+        .bull {
         padding: 0 5px;
         color: #555;
-      }
+        }
 
-      #title {
+        #title {
         position: absolute;
         top: 20px;
         width: 270px;
@@ -64,9 +64,9 @@
         border-radius: 3px;
         font: 20px Georgia;
         padding: 10px;
-      }
+        }
 
-      .year {
+        .year {
         font: 16px Georgia;
         line-height: 26px;
         height: 30px;
@@ -77,18 +77,18 @@
 
         cursor: pointer;
         -webkit-transition: all 0.1s ease-out;
-      }
+        }
 
-      .year:hover, .year.active {
+        .year:hover, .year.active {
         font-size: 23px;
         color: #fff;
-      }
+        }
 
-      #ce span {
+        #ce span {
         display: none;
-      }
+        }
 
-      #ce {
+        #ce {
         width: 107px;
         height: 55px;
         display: block;
@@ -96,65 +96,66 @@
         bottom: 15px;
         left: 20px;
         background: url(/globe/ce.png);
-      }
+        }
 
 
     </style>
-  </head>
-  <body>
+</head>
+<body>
 
-  <div id="container"></div>
+<div id="container"></div>
 
-  <div id="info">
+<div id="info">
     <strong><a href="http://www.chromeexperiments.com/globe">WebGL Globe</a></strong> <span class="bull">&bull;</span> Created by the Google Data Arts Team <span class="bull">&bull;</span> Data acquired from <a href="http://sedac.ciesin.columbia.edu/gpw/">SEDAC</a>
-  </div>
+</div>
 
-  <div id="title">
+<div id="title">
     Count globe
-  </div>
+</div>
 
-  <a id="ce" href="http://www.chromeexperiments.com/globe">
+<a id="ce" href="http://www.chromeexperiments.com/globe">
     <span>This is a Chrome Experiment</span>
-  </a>
+</a>
 
-  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-  <script type="text/javascript" src="/globe/third-party/Three/ThreeWebGL.js"></script>
-  <script type="text/javascript" src="/globe/third-party/Three/ThreeExtras.js"></script>
-  <script type="text/javascript" src="/globe/third-party/Three/RequestAnimationFrame.js"></script>
-  <script type="text/javascript" src="/globe/third-party/Three/Detector.js"></script>
-  <script type="text/javascript" src="/globe/third-party/Tween.js"></script>
-  <script type="text/javascript" src="/globe/globe.js"></script>
-  <script type="text/javascript">
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="/globe/third-party/Three/ThreeWebGL.js"></script>
+<script type="text/javascript" src="/globe/third-party/Three/ThreeExtras.js"></script>
+<script type="text/javascript" src="/globe/third-party/Three/RequestAnimationFrame.js"></script>
+<script type="text/javascript" src="/globe/third-party/Three/Detector.js"></script>
+<script type="text/javascript" src="/globe/third-party/Tween.js"></script>
+<script type="text/javascript" src="/globe/globe.js"></script>
+<script type="text/javascript">
 
     if(!Detector.webgl){
-      Detector.addGetWebGLMessage();
+        Detector.addGetWebGLMessage();
     } else {
+        // Where to put the globe?
+        var container = document.getElementById( 'container' );
 
-      // Where to put the globe?
-      var container = document.getElementById( 'container' );
+        // Make the globe
+        var globe = new DAT.Globe( container );
 
-      // Make the globe
-      var globe = new DAT.Globe( container );
+        var url = '/points?topLeftLat=90.0&topLeftLon=-180.0&bottomRightLat=-90.0&bottomRightLon=180';
 
-      var url = '/counts?topLeftLat=90.0&topLeftLon=-180.0&bottomRightLat=-90.0&bottomRightLon=180';
+        $.getJSON(url, function(data) {
+            points = [];
+            for ( i = 0; i < data.length; i++ ) {
+                points.push(data[i].point.lat)
+                points.push(data[i].point.lon)
+                points.push(data[i].data.value / 5000)
+            }
+            globe.addData( points, {format: 'magnitude'} );
 
-      $.getJSON(url, function(data) {
+            // Create the geometry
+            globe.createPoints();
 
-          for ( i = 0; i < data.length; i++ ) {
-              globe.addData( [data[i].point.lat, data[i].point.lon, data[i].data.value], {format: 'magnitude'} );
-          }
-
-          // Create the geometry
-          globe.createPoints();
-
-          // Begin animation
-          globe.animate();
-
-      });
+            // Begin animation
+            globe.animate();
+        });
     }
 
-  </script>
+</script>
 
-  </body>
+</body>
 
 </html>

@@ -18,6 +18,10 @@ DAT.Globe = function(container, colorFn) {
   colorFn = colorFn || function(x) {
     var c = new THREE.Color();
     c.setHSV( ( 0.6 - ( x * 0.5 ) ), 1.0, 1.0 );
+
+    console.log(x)
+    console.log(c)
+
     return c;
   };
 
