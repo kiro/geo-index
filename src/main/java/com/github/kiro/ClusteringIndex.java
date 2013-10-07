@@ -14,23 +14,23 @@ public class ClusteringIndex {
     private final CountIndex cityLevel = new CountIndex(km(5));
     private final CountIndex worldLevel = new CountIndex(km(500));
 
-    public void update(Point p) {
+    public synchronized void update(Point p) {
         streetLevel.update(p);
         cityLevel.update(p);
         worldLevel.update(p);
     }
 
-    public void remove(Point p) {
+    public synchronized void remove(Point p) {
         streetLevel.remove(p);
         cityLevel.remove(p);
         worldLevel.remove(p);
     }
 
-    public List<Point> kNearest(Point p, int k, Distance maxDistance) {
+    public synchronized List<Point> kNearest(Point p, int k, Distance maxDistance) {
         return streetLevel.kNearest(p, k, maxDistance);
     }
 
-    public List<DataPoint<AtomicInteger>> within(Point topLeft, Point bottomRight) {
+    public synchronized List<DataPoint<AtomicInteger>> within(Point topLeft, Point bottomRight) {
         Distance viewDistance = topLeft.distance(bottomRight);
 
         if (viewDistance.lessThan(km(20))) {

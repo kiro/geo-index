@@ -1,3 +1,6 @@
 [submodule "nsq-java"]
 	path = nsq-java
 	url = https://github.com/kiro/nsq-java.git
+[submodule "java-libraries"]
+	path = java-libraries
+	url = https://github.com/hailocab/java-libraries.git

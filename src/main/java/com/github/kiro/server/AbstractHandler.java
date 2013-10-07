@@ -56,6 +56,7 @@ public abstract class AbstractHandler implements HttpHandler {
         httpExchange.sendResponseHeaders(200, outputStream.size());
         OutputStream responseStream = httpExchange.getResponseBody();
         responseStream.write(outputStream.toByteArray());
+        responseStream.flush();
         responseStream.close();
     }
 }

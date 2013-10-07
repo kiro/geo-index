@@ -42,10 +42,15 @@ public class Server {
         System.out.println("Started listening...");
     }
 
-    public static void main(String [] args) throws Exception {
+    public static void listenToNSQ(int ... ports) throws Exception {
+        ClusteringIndex index = new ClusteringIndex();
+
+        new Server(8080, "html", index).start();
+        new NsqListener(index, "localhost", ports).listen();
+    }
+
+    public static void loadTest() throws Exception {
         ClusteringIndex pointsIndex = new ClusteringIndex();
-        //pointsIndex.addAll(tubeStations());
-        //new NsqListener(pointsIndex, "vpcutilities01-global01-test.i.hailocab.com", 4150).listen();
 
         Random random = new Random();
 
@@ -62,5 +67,9 @@ public class Server {
         //new NsqListener(pointsIndex, "localhost", 4153).listen();
         new Server(8080, "html", pointsIndex).start();
         System.out.println("Server started...");
+    }
+
+    public static void main(String [] args) throws Exception {
+        listenToNSQ(5670, 5671, 5672);
     }
 }

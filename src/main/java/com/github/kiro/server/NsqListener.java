@@ -1,5 +1,6 @@
 package com.github.kiro.server;
 
+import com.github.kiro.ClusteringIndex;
 import com.github.kiro.Point;
 import com.github.kiro.PointsIndex;
 import com.google.gson.JsonObject;
@@ -18,14 +19,14 @@ import static com.github.kiro.Point.point;
 public class NsqListener {
     private static final String NSQ_TOPIC = "jstats.allingested";
     private static final String CHANNEL = "kiro-experiment";
-    private final PointsIndex pointsIndex;
-    private final String nsqAddress;
-    private final int nsqPort;
+    private final ClusteringIndex index;
+    private final int [] ports;
+    private final String host;
 
-    public NsqListener(PointsIndex pointsIndex, String nsqAddress, int nsqPort) {
-        this.pointsIndex = pointsIndex;
-        this.nsqAddress = nsqAddress;
-        this.nsqPort = nsqPort;
+    public NsqListener(ClusteringIndex index, String host, int ... ports) {
+        this.index = index;
+        this.host = host;
+        this.ports = ports;
     }
 
     public void listen() throws Exception {
@@ -41,7 +42,7 @@ public class NsqListener {
                     double lon = Double.parseDouble(jsonObject.get("longitude").getAsString());
 
                     Point point = point(driverId, lat, lon);
-                    pointsIndex.update(point);
+                    index.update(point);
                 }
 
                 return true;
@@ -49,7 +50,10 @@ public class NsqListener {
         };
 
         SyncResponseReader reader = new SyncResponseReader(NSQ_TOPIC, CHANNEL + "#ephemeral", handler);
-        reader.connectToNsqd(nsqAddress, nsqPort);
+
+        for (int port : ports) {
+            reader.connectToNsqd(host, port);
+        }
         //reader.addLookupd(new BasicLookupd(nsqAddress + ":" + nsqPort));
     }
 }
