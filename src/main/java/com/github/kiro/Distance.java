@@ -10,6 +10,10 @@ public class Distance {
         this.meters = meters;
     }
 
+    public boolean lessThan(Distance distance) {
+        return this.meters < distance.meters;
+    }
+
     public static Distance meters(double meters) {
         return new Distance(meters);
     }

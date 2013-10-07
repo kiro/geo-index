@@ -34,7 +34,7 @@
 
         var updateMarkers = function(points) {
             for (var i = 0; i < markers.length; i++) {
-                markers[i].map = null;
+                markers[i].setMap(null);
             }
 
             markers = [];
@@ -51,7 +51,7 @@
             var sw = bounds.getSouthWest();
 
             console.log(ne);
-            var url = '/counts?topLeftLat=' + ne.lat() + '&topLeftLon=' + sw.lng() + '&bottomRightLat=' + sw.lat() + '&bottomRightLon=' + ne.lng();
+            var url = '/points?topLeftLat=' + ne.lat() + '&topLeftLon=' + sw.lng() + '&bottomRightLat=' + sw.lat() + '&bottomRightLon=' + ne.lng();
 
             console.log(url);
 
@@ -61,7 +61,6 @@
                 }
             );
         }
-
 
 /*
         var refreshCycle;

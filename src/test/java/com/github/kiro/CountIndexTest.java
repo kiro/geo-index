@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.kiro.Distance.km;
-import static com.github.kiro.Files.tubeStations;
+import static com.github.kiro.server.Files.tubeStations;
 import static org.junit.Assert.assertEquals;
 
 /**

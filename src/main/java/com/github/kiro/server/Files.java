@@ -1,6 +1,7 @@
-package com.github.kiro;
+package com.github.kiro.server;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.github.kiro.Point;
 
 import java.io.FileReader;
 import java.util.Arrays;

@@ -1,16 +1,12 @@
 package com.github.kiro;
 
-import au.com.bytecode.opencsv.CSVReader;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.FileReader;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.github.kiro.Distance.km;
-import static com.github.kiro.Files.tubeStations;
-import static com.github.kiro.Files.worldCapitals;
+import static com.github.kiro.server.Files.tubeStations;
+import static com.github.kiro.server.Files.worldCapitals;
 import static com.github.kiro.Points.*;
 import static com.github.kiro.Point.point;
 import static com.google.common.collect.Lists.newArrayList;
@@ -101,7 +97,7 @@ public class PointsIndexTest {
         List<Point> capitals = worldCapitals();
         List<Point> points = newArrayList();
 
-        PointsIndex pointsIndex = new PointsIndex(km(0.5));
+        ClusteringIndex pointsIndex = new ClusteringIndex();
 
         for (Point capital : capitals) {
             for (int i = 0; i < 5000; i++) {
@@ -111,7 +107,7 @@ public class PointsIndexTest {
                         capital.lon + Math.random() * 0.1
                 );
                 points.add(p);
-                pointsIndex.add(p);
+                pointsIndex.update(p);
             }
         }
 

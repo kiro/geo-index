@@ -1,6 +1,7 @@
 package com.github.kiro.server;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.github.kiro.ClusteringIndex;
 import com.github.kiro.CountIndex;
 import com.github.kiro.Point;
 import com.github.kiro.PointsIndex;
@@ -9,9 +10,12 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.FileReader;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Random;
 
 import static com.github.kiro.Distance.km;
 import static com.github.kiro.Point.point;
+import static com.github.kiro.server.Files.tubeStations;
+import static com.github.kiro.server.Files.worldCapitals;
 import static com.google.common.collect.Lists.newArrayList;
 
 /**
@@ -19,50 +23,44 @@ import static com.google.common.collect.Lists.newArrayList;
  */
 public class Server {
     private HttpServer server;
-    private PointsIndex pointsIndex;
-    private CountIndex countIndex;
+    private ClusteringIndex index;
 
     private final String rootPath;
 
-    public Server(int port, String rootPath, PointsIndex pointsIndex, CountIndex countIndex) throws Exception {
+    public Server(int port, String rootPath, ClusteringIndex index) throws Exception {
         this.server = HttpServer.create(new InetSocketAddress(port), 0);
         this.rootPath = rootPath;
-        this.pointsIndex = pointsIndex;
-        this.countIndex = countIndex;
+        this.index = index;
     }
 
     public void start() {
         server.createContext("/", new FileHandler(rootPath));
-        server.createContext("/points", new PointsHandler(pointsIndex));
-        server.createContext("/counts", new CountHandler(countIndex));
+        server.createContext("/points", new PointsHandler(index));
+        server.createContext("/knearest", new KNearestHandler(index));
         server.start();
 
         System.out.println("Started listening...");
     }
 
-    private static List<Point> tubeStations() throws Exception {
-        List<Point> stations = newArrayList();
-        CSVReader reader = new CSVReader(new FileReader("html/tube.csv"));
-
-        for (String [] parts : reader.readAll()) {
-            stations.add(point(parts[0], Double.parseDouble(parts[1]), Double.parseDouble(parts[2])));
-        }
-
-        return stations;
-    }
-
     public static void main(String [] args) throws Exception {
-        PointsIndex pointsIndex = new PointsIndex(km(0.5));
+        ClusteringIndex pointsIndex = new ClusteringIndex();
         //pointsIndex.addAll(tubeStations());
         //new NsqListener(pointsIndex, "vpcutilities01-global01-test.i.hailocab.com", 4150).listen();
 
-        CountIndex countIndex = new CountIndex(km(2));
-        for (Point station : tubeStations()) {
-            countIndex.update(station);
+        Random random = new Random();
+
+        System.out.println("Adding points...");
+        for (Point capital : worldCapitals()) {
+            for (int i = 0; i < 4000; i++) {
+                Point p = point(capital.id + i, capital.lat + random.nextGaussian()*0.1, capital.lon + random.nextGaussian()*0.1);
+                pointsIndex.update(p);
+            }
         }
 
+        System.out.println(pointsIndex.size());
+
         //new NsqListener(pointsIndex, "localhost", 4153).listen();
-        new Server(8080, "html", pointsIndex, countIndex).start();
+        new Server(8080, "html", pointsIndex).start();
         System.out.println("Server started...");
     }
 }
