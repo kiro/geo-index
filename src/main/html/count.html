@@ -20,27 +20,39 @@
 
         var map;
         var markers = [];
+        var nearest = [];
 
-        var createMarker = function(cluster) {
+        var createMarker = function(cluster, orange) {
+            if (orange) {
+                icon = 'http://maps.google.com/mapfiles/marker_orange.png';
+            } else {
+                icon = 'http://maps.google.com/mapfiles/marker.png';
+            }
+
             var pointLatlng = new google.maps.LatLng(cluster.point.lat, cluster.point.lon);
             var marker = new google.maps.Marker({
                 position: pointLatlng,
                 map: map,
+                icon: icon,
                 title: cluster.point.id + " " + cluster.data.value
             });
+
+            if (orange) {
+                marker.setZIndex(9999);
+            }
 
             return marker;
         }
 
-        var updateMarkers = function(points) {
-            for (var i = 0; i < markers.length; i++) {
-                markers[i].setMap(null);
+        var updateMarkers = function(markersArray, points, orange) {
+            for (var i = 0; i < markersArray.length; i++) {
+                markersArray[i].setMap(null);
             }
 
-            markers = [];
+            markersArray.length = 0;
 
             for (var i = 0; i < points.length; i++) {
-                markers.push(createMarker(points[i]));
+                markersArray.push(createMarker(points[i], orange));
             }
         }
 
@@ -57,7 +69,22 @@
 
             $.getJSON(url,
                 function(data) {
-                    updateMarkers(data);
+                    updateMarkers(markers, data, false);
+                }
+            );
+        }
+
+        var knearest = function(event) {
+            var lat = event.latLng.lat()
+            var lon = event.latLng.lng()
+
+            var k = 7
+
+            var url = '/knearest?lat=' + lat + '&lon=' + lon + '&k=' + k;
+
+            $.getJSON(url,
+                function(data) {
+                    updateMarkers(nearest, data, true);
                 }
             );
         }
@@ -81,6 +108,7 @@
             clusterer = new MarkerClusterer(map, [], {maxZoom:14});
 
             google.maps.event.addListener(map, 'idle', refresh);
+            google.maps.event.addListener(map, 'click', knearest);
         }
 
         $(document).ready(initialize);

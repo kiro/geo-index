@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.kiro.Distance.km;
 import static com.github.kiro.Point.point;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * k-nearest handler.
@@ -36,6 +37,12 @@ public class KNearestHandler extends AbstractHandler {
 
         List<Point> nearest = index.kNearest(point("k-nearest-query", lat, lon), k, maxDistance);
 
-        outputStream.write(toResultsJson(nearest));
+        List<DataPoint<AtomicInteger>> dataPoints = newArrayList();
+
+        for (Point point : nearest) {
+            dataPoints.add(new DataPoint<AtomicInteger>(new AtomicInteger(1), point));
+        }
+
+        outputStream.write(toResultsJson(dataPoints));
     }
 }
