@@ -42,7 +42,7 @@ public class ClusteringIndex {
             }
 
             return result;
-        } else if (viewDistance.lessThan(km(200))) {
+        } else if (viewDistance.lessThan(km(1000))) {
             return cityLevel.within(topLeft, bottomRight);
         } else {
             return worldLevel.within(topLeft, bottomRight);
