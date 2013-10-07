@@ -15,13 +15,13 @@ import static com.google.common.collect.Lists.newArrayList;
  */
 public class CountIndex {
     private final Map<String, Point> lastPosition;
-    private final GeoIndex<AtomicInteger> counters;
+    private final GeoIndex<ClusterCount> counters;
 
     public CountIndex(Distance size) {
-        counters = new GeoIndex<AtomicInteger>(size, new Function<Void, AtomicInteger>() {
+        counters = new GeoIndex<ClusterCount>(size, new Function<Void, ClusterCount>() {
             @Override
-            public AtomicInteger apply(Void aVoid) {
-                return new AtomicInteger(0);
+            public ClusterCount apply(Void aVoid) {
+                return new ClusterCount();
             }
         });
 
@@ -35,14 +35,21 @@ public class CountIndex {
         }
         lastPosition.put(p.id, p);
 
-        counters.get(p).incrementAndGet();
+        counters.get(p).add(p);
     }
 
     public void remove(Point p) {
-        counters.get(p).decrementAndGet();
+        counters.get(p).remove(p);
     }
 
     public List<DataPoint<AtomicInteger>> within(Point topLeft, Point bottomRight) {
-        return counters.dataPointsWithin(topLeft, bottomRight);
+        List<DataPoint<AtomicInteger>> result = newArrayList();
+        List<ClusterCount> countersWithin = counters.within(topLeft, bottomRight);
+
+        for (ClusterCount clusterCount : countersWithin) {
+            result.add(clusterCount.dataPoint());
+        }
+
+        return result;
     }
 }
