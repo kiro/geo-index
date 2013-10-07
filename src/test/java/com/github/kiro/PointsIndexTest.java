@@ -81,15 +81,30 @@ public class PointsIndexTest {
         System.out.println(count);
     }
 
+    class Timer {
+        private long time;
+
+        public Timer() {
+            time = System.currentTimeMillis();
+        }
+
+        public void measure(String text) {
+            long next = System.currentTimeMillis();
+            System.out.println(text + " " + ((next - time) / 1000.0));
+            time = next;
+        }
+    }
+
     @Test
     public void testWithALotOfPoints() throws Exception {
+        Timer timer = new Timer();
         List<Point> capitals = worldCapitals();
         List<Point> points = newArrayList();
 
         PointsIndex pointsIndex = new PointsIndex(km(0.5));
 
         for (Point capital : capitals) {
-            for (int i = 0; i < 500; i++) {
+            for (int i = 0; i < 5000; i++) {
                 Point p = point(
                         capital.id + i,
                         capital.lat + Math.random() * 0.1,
@@ -100,10 +115,14 @@ public class PointsIndexTest {
             }
         }
 
+        timer.measure("add");
+
         for (Point p : points) {
             Point next = point(p.id, p.lat + Math.random() * 0.1, p.lon + Math.random() * 0.1);
             pointsIndex.update(next);
         }
+
+        timer.measure("update");
 
         int nearest = 0;
         for (Point p : points) {
@@ -113,6 +132,9 @@ public class PointsIndexTest {
             //System.out.println(p);
             //System.out.println(knearest);
         }
+
+        timer.measure("knearest");
+
         System.out.println(nearest);
         System.out.println(pointsIndex.size());
     }

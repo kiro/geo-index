@@ -83,7 +83,7 @@ public class PointsIndex {
 
         Iterable<Point> points = Iterables.concat(blocks);
         List<Point> pointsList = newArrayList(points);
-        Collections.sort(pointsList, comparator(point));
+      //  Collections.sort(pointsList, comparator(point));
 
         return pointsList.subList(0, Math.min(pointsList.size(), k));
     }
